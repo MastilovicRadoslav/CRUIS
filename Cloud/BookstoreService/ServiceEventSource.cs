@@ -1,9 +1,9 @@
 using System.Diagnostics.Tracing;
 using System.Fabric;
 
-namespace Bookstore
+namespace BookstoreService
 {
-    [EventSource(Name = "MyCompany-Cloud-Bookstore")]
+    [EventSource(Name = "MyCompany-Cloud-BookstoreService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();

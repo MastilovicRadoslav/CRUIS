@@ -1,7 +1,7 @@
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.Diagnostics;
 
-namespace Bookstore
+namespace BookstoreService
 {
     internal static class Program
     {
@@ -17,10 +17,10 @@ namespace Bookstore
                 // When Service Fabric creates an instance of this service type,
                 // an instance of the class is created in this host process.
 
-                ServiceRuntime.RegisterServiceAsync("BookstoreType",
-                    context => new Bookstore(context)).GetAwaiter().GetResult();
+                ServiceRuntime.RegisterServiceAsync("BookstoreServiceType",
+                    context => new BookstoreService(context)).GetAwaiter().GetResult();
 
-                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(Bookstore).Name);
+                ServiceEventSource.Current.ServiceTypeRegistered(Process.GetCurrentProcess().Id, typeof(BookstoreService).Name);
 
                 // Prevents this host process from terminating so services keep running.
                 Thread.Sleep(Timeout.Infinite);
