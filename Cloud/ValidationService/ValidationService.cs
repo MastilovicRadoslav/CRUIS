@@ -1,36 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Threading.Tasks;
-using Common.Interfaces;
+﻿using Common.Interfaces;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric;
+using System.Threading.Tasks;
 
-namespace Validation
+namespace ValidationService
 {
     internal sealed class ValidationService : StatelessService, IValidation
     {
-        private readonly ITransactionCoordinator coordinator;
+        private readonly ITransactionCoordinator _transactionCoordinator;
 
         public ValidationService(StatelessServiceContext context) : base(context)
         {
-            coordinator = ServiceProxy.Create<ITransactionCoordinator>(new Uri("fabric:/Cloud/TransactionCoordinatorService"));
+            _transactionCoordinator = ServiceProxy.Create<ITransactionCoordinator>(new Uri("fabric:/Cloud/TransactionCoordinatorService"));
         }
 
-        // Validira podatke o transakciji i prosleđuje zahtev TransactionCoordinator-u
+        // Validira podatke o transakciji i prosleđuje zahtev TransactionCoordinator-u ako validacija uspe
         public async Task<bool> Validate(string clientId, string productId, uint quantity, double unitPrice)
         {
             try
             {
                 // Provera osnovne validnosti podataka
                 if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(productId) || quantity < 1 || unitPrice < 0)
+                {
                     return false;
+                }
 
-                // Prosleđuje zahtev TransactionCoordinator servisu
-                return await coordinator.BuyBook(clientId, productId, quantity, unitPrice);
+                // Ako validacija prođe, poziva TransactionCoordinator za obavljanje kupovine
+                return await _transactionCoordinator.BuyBook(clientId, productId, quantity, unitPrice);
             }
             catch
             {
