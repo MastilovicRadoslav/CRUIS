@@ -1,9 +1,9 @@
 using System.Diagnostics.Tracing;
 using System.Fabric;
 
-namespace Bank
+namespace BankService
 {
-    [EventSource(Name = "MyCompany-Cloud-Bank")]
+    [EventSource(Name = "MyCompany-Cloud-BankService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
