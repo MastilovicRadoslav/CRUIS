@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Services.Remoting;
+﻿using Common.Models;
+using Microsoft.ServiceFabric.Services.Remoting;
 using System.ServiceModel;
 
 namespace Common.Interfaces
@@ -8,5 +9,11 @@ namespace Common.Interfaces
     {
         [OperationContract]
         Task<bool> Validate(string clientId, string productId, uint quantity, double unitPrice);
+
+        [OperationContract]
+        Task<IEnumerable<Customer>> ListClients();
+
+        [OperationContract]
+        Task<IEnumerable<Product>> ListBooks();
     }
 }
