@@ -3,7 +3,6 @@ using Common.Interfaces;
 using Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.ServiceFabric.Services.Client;
-using Microsoft.ServiceFabric.Services.Communication.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using System;
 using System.Collections.Generic;
@@ -15,32 +14,26 @@ namespace Client.Controllers
     [Route("api/[controller]/[action]")]
     public class PurchaseController : ControllerBase
     {
-        private readonly ITransactionCoordinator _transactionCoordinator;
-        private readonly IBank _bankService;
-        private readonly IBookstore _bookstoreService;
         private readonly IValidation _validationService;
 
         public PurchaseController()
         {
-            _transactionCoordinator = ServiceProxy.Create<ITransactionCoordinator>(new Uri("fabric:/Cloud/TransactionCoordinatorService")); //nema particija
-            _bankService = ServiceProxy.Create<IBank>(new Uri("fabric:/Cloud/BankService"), new ServicePartitionKey(0), TargetReplicaSelector.Default); //ima particija
-            _bookstoreService = ServiceProxy.Create<IBookstore>(new Uri("fabric:/Cloud/BookstoreService"), new ServicePartitionKey(0), TargetReplicaSelector.Default);
             _validationService = ServiceProxy.Create<IValidation>(new Uri("fabric:/Cloud/ValidationService"));
         }
 
-        // Vraća listu dostupnih korisnika
+        // Vraća listu dostupnih korisnika preko ValidationService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> ListClients()
         {
-            var clients = await _bankService.ListClients();
+            var clients = await _validationService.ListClients();
             return Ok(clients);
         }
 
-        // Vraća listu dostupnih proizvoda (knjiga)
+        // Vraća listu dostupnih proizvoda (knjiga) preko ValidationService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> ListBooks()
         {
-            var books = await _bookstoreService.ListAvailableItems();
+            var books = await _validationService.ListBooks();
             return Ok(books);
         }
 
