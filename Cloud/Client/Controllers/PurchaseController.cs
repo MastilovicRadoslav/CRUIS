@@ -44,11 +44,11 @@ namespace Client.Controllers
             try
             {
                 bool success = await _validationService.Validate(purchaseRequest.UserId, purchaseRequest.BookId, (uint)purchaseRequest.Quantity, purchaseRequest.PricePerPC);
-                return success ? Ok("Purchase successful") : BadRequest("Purchase failed. Please check your balance or stock availability.");
+                return success ? Ok("Kupovina uspešna.") : BadRequest("Kupovina nije uspela. Proverite stanje na računu ili dostupnost knjiga u biblioteci.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Interna greška servera:{ex.Message}");
             }
         }
     }

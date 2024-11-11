@@ -31,7 +31,7 @@ namespace ValidationService
             // Validacija: proverava da li lista nije prazna
             if (clients == null)
             {
-                throw new Exception("Failed to retrieve clients: null response from BankService.");
+                throw new Exception("Neuspelo preuzimanje klijenata: prazan odgovor od BankService.");
             }
 
             // Dodatna validacija za svaki klijent (opciono)
@@ -39,7 +39,7 @@ namespace ValidationService
             {
                 if (string.IsNullOrWhiteSpace(client.ClientId) || string.IsNullOrWhiteSpace(client.FullName) || client.AccountBalance < 0)
                 {
-                    throw new Exception($"Invalid client data detected: {client.ClientId}, {client.FullName}");
+                    throw new Exception($"Otkriveni su nevažeći podaci klijenta: {client.ClientId}, {client.FullName}");
                 }
             }
 
@@ -54,7 +54,7 @@ namespace ValidationService
             // Validacija: proverava da li lista nije prazna
             if (products == null)
             {
-                throw new Exception("Failed to retrieve products: null response from BookstoreService.");
+                throw new Exception("Nije moguće preuzeti proizvode: prazan odgovor iz biblioteke");
             }
 
             // Dodatna validacija za svaki proizvod (opciono)
@@ -62,7 +62,7 @@ namespace ValidationService
             {
                 if (string.IsNullOrWhiteSpace(product.BookId) || string.IsNullOrWhiteSpace(product.NameBook) || product.UnitPrice < 0 || product.Quantity < 0)
                 {
-                    throw new Exception($"Invalid product data detected: {product.BookId}, {product.NameBook}");
+                    throw new Exception($"Otkriveni neispravni podaci o knjizi: {product.BookId}, {product.NameBook}");
                 }
             }
 

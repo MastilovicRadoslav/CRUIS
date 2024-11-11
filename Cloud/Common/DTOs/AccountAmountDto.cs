@@ -11,9 +11,5 @@
             ClientId = clientId;
             AccountBalance = balance;
         }
-
-
-
-
     }
 }

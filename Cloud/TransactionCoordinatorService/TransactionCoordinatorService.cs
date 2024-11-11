@@ -25,9 +25,9 @@ namespace TransactionCoordinatorService
         {
             try
             {
-                // Rezerviše proizvod i sredstva
-                await store.EnlistPurchase(productId, quantity);
-                await bank.EnlistMoneyTransfer(clientId, quantity * unitPrice);
+                // Rezerviše knjigu i sredstva
+                await store.EnlistPurchase(productId, quantity); //ID knjige i broj knjiga za kupovinu te knjige
+                await bank.EnlistMoneyTransfer(clientId, quantity * unitPrice); //ID kupca knjige i broj knnjiga za kupovinu * cijena jedne knjige
 
                 // Priprema obe strane transakcije
                 if (await store.Prepare() && await bank.Prepare())
