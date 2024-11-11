@@ -2,9 +2,9 @@
 {
     public class Customer
     {
-        public string ClientId { get; set; }
-        public string FullName { get; set; }
-        public double AccountBalance { get; set; }
+        public string ClientId { get; set; } //Kupcov ID za identifikaciju
+        public string FullName { get; set; } //Ime kupca
+        public double AccountBalance { get; set; } //Stanje na računu kupca
 
         public Customer()
         {

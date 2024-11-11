@@ -2,14 +2,14 @@
 {
     public class OrderRequestDto
     {
-        public string ProductId { get; set; }
+        public string BookId { get; set; }
         public uint Quantity { get; set; }
 
         public OrderRequestDto() { }
 
         public OrderRequestDto(string productId, uint quantity)
         {
-            ProductId = productId;
+            BookId = productId;
             Quantity = quantity;
         }
     }

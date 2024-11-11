@@ -7,12 +7,12 @@ namespace Common.Interfaces
     public interface ITransaction : IService
     {
         [OperationContract]
-        Task<bool> Prepare();
+        Task<bool> Prepare(); // Priprema za izvrsavanje kupovine
 
         [OperationContract]
-        Task<bool> Commit();
+        Task<bool> Commit(); // Izvrsavanje kupovine
 
         [OperationContract]
-        Task Rollback();
+        Task Rollback(); //Ponistavanje kupovine
     }
 }

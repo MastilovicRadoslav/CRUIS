@@ -11,39 +11,39 @@ namespace BookstoreService
 {
     internal sealed class BookstoreService : StatefulService, IBookstore
     {
-        private IReliableDictionary<string, Product>? productInventory;
-        private Dictionary<string, OrderRequestDto> reservationDictionary = new(); // Skladište za rezervacije
-        private Dictionary<string, OrderRequestDto> pendingReservations = new(); // Skladište za rezervacije koje čekaju potvrdu
+        private IReliableDictionary<string, Book>? library; //IReliable baza za knjige
+        private Dictionary<string, OrderRequestDto> reservationDictionary = new(); // Skladište za rezervacije knjiga za kupovinu
+        private Dictionary<string, OrderRequestDto> pendingReservations = new(); // Skladište za rezervacijeknjiga koje čekaju potvrdu kupovine
 
         public BookstoreService(StatefulServiceContext context) : base(context) { }
 
         // Vraća listu dostupnih proizvoda (knjiga) u inventaru
-        public async Task<IEnumerable<Product>> ListAvailableItems()
+        public async Task<IEnumerable<Book>> ListAvailableItems()
         {
             using var trx = StateManager.CreateTransaction();
-            var allProducts = await productInventory.CreateEnumerableAsync(trx);
+            var allProducts = await library.CreateEnumerableAsync(trx);
             var enumerator = allProducts.GetAsyncEnumerator();
-            List<Product> availableProducts = new();
+            List<Book> availableProducts = new();
 
             while (await enumerator.MoveNextAsync(CancellationToken.None))
             {
-                if (enumerator.Current.Value.StockQuantity > 0)
+                if (enumerator.Current.Value.Quantity > 0) // Ako postoje knjige u biblioteci
                 {
-                    availableProducts.Add(enumerator.Current.Value); // Dodaj proizvode koji su na stanju
+                    availableProducts.Add(enumerator.Current.Value); // Dodaj knjige koje su na stanju
                 }
             }
             return availableProducts;
         }
 
-        // Dodaje rezervaciju za određeni proizvod
+        // Dodaje rezervaciju za određenu knjigu
         public async Task EnlistPurchase(string productId, uint quantity)
         {
             using var trx = StateManager.CreateTransaction();
-            var productResult = await productInventory.TryGetValueAsync(trx, productId);
-
-            if (productResult.HasValue && productResult.Value.StockQuantity >= quantity)
+            var productResult = await library.TryGetValueAsync(trx, productId);
+            //Ako postoji i ako je broj zahtijevanih knjiga za kupovinu manji od broja knjiga kojih ima u biblioteci
+            if (productResult.HasValue && productResult.Value.Quantity >= quantity)
             {
-                var reservation = new OrderRequestDto(productResult.Value.ProductId, quantity);
+                var reservation = new OrderRequestDto(productResult.Value.BookId, quantity);
                 reservationDictionary[productId] = reservation; // Dodajemo rezervaciju u reservationDictionary
             }
         }
@@ -52,11 +52,11 @@ namespace BookstoreService
         public async Task<double> GetItemPrice(string productId)
         {
             using var trx = StateManager.CreateTransaction();
-            var productResult = await productInventory.TryGetValueAsync(trx, productId);
+            var productResult = await library.TryGetValueAsync(trx, productId);
             return productResult.HasValue ? productResult.Value.UnitPrice : 0;
         }
 
-        // Priprema rezervaciju (kupovinu) tako što premesti stavke iz reservationDictionary u pendingReservations
+        // Priprema kupovinu tako što premesti stavke iz reservationDictionary u pendingReservations
         public async Task<bool> Prepare()
         {
             using var trx = StateManager.CreateTransaction();
@@ -72,16 +72,16 @@ namespace BookstoreService
         // Izvršava rezervaciju(kupovina) i ažurira količinu proizvoda na stanju
         public async Task<bool> Commit()
         {
-            if (productInventory is not null)
+            if (library is not null)
             {
                 using var trx = StateManager.CreateTransaction();
                 foreach (var reservation in pendingReservations)
                 {
-                    var productResult = await productInventory.TryGetValueAsync(trx, reservation.Key);
+                    var productResult = await library.TryGetValueAsync(trx, reservation.Key);
                     if (productResult.HasValue)
                     {
-                        productResult.Value.StockQuantity -= reservation.Value.Quantity; // Ažuriraj količinu proizvoda
-                        await productInventory.SetAsync(trx, reservation.Key, productResult.Value);
+                        productResult.Value.Quantity -= reservation.Value.Quantity; // Ažuriraj količinu proizvoda
+                        await library.SetAsync(trx, reservation.Key, productResult.Value);
                     }
                 }
                 await trx.CommitAsync();
@@ -101,13 +101,13 @@ namespace BookstoreService
         // Inicijalizuje kolekciju proizvoda sa početnim podacima
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            productInventory = await StateManager.GetOrAddAsync<IReliableDictionary<string, Product>>("productInventory");
+            library = await StateManager.GetOrAddAsync<IReliableDictionary<string, Book>>("productInventory");
             using var trx = StateManager.CreateTransaction();
 
-            for (int i = 1; i <= 5; i++)
+            for (int i = 1; i <= 7; i++)
             {
-                var product = new Product($"Proizvod {i}", (uint)new Random().Next(1, 20), new Random().NextDouble() * 50);
-                await productInventory.TryAddAsync(trx, product.ProductId, product);
+                var product = new Book($"Knjiga {i}", (uint)new Random().Next(1, 20), new Random().NextDouble() * 50);
+                await library.TryAddAsync(trx, product.BookId, product);
             }
 
             await trx.CommitAsync();

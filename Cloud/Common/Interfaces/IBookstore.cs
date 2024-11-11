@@ -8,7 +8,7 @@ namespace Common.Interfaces
     public interface IBookstore : IService, ITransaction
     {
         [OperationContract]
-        Task<IEnumerable<Product>> ListAvailableItems();
+        Task<IEnumerable<Book>> ListAvailableItems();
 
         [OperationContract]
         Task EnlistPurchase(string productId, uint quantity);

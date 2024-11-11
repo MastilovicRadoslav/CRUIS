@@ -47,7 +47,7 @@ namespace ValidationService
         }
 
         // Vraća listu dostupnih proizvoda (knjiga)
-        public async Task<IEnumerable<Product>> ListBooks()
+        public async Task<IEnumerable<Book>> ListBooks()
         {
             var products = await _bookstoreService.ListAvailableItems();
 
@@ -60,9 +60,9 @@ namespace ValidationService
             // Dodatna validacija za svaki proizvod (opciono)
             foreach (var product in products)
             {
-                if (string.IsNullOrWhiteSpace(product.ProductId) || string.IsNullOrWhiteSpace(product.Name) || product.UnitPrice < 0 || product.StockQuantity < 0)
+                if (string.IsNullOrWhiteSpace(product.BookId) || string.IsNullOrWhiteSpace(product.NameBook) || product.UnitPrice < 0 || product.Quantity < 0)
                 {
-                    throw new Exception($"Invalid product data detected: {product.ProductId}, {product.Name}");
+                    throw new Exception($"Invalid product data detected: {product.BookId}, {product.NameBook}");
                 }
             }
 

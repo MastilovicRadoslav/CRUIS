@@ -31,7 +31,7 @@ namespace Client.Controllers
 
         // Vraća listu dostupnih proizvoda (knjiga) preko ValidationService
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> ListBooks()
+        public async Task<ActionResult<IEnumerable<Book>>> ListBooks()
         {
             var books = await _validationService.ListBooks();
             return Ok(books);

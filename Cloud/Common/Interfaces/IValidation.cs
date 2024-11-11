@@ -14,6 +14,6 @@ namespace Common.Interfaces
         Task<IEnumerable<Customer>> ListClients();
 
         [OperationContract]
-        Task<IEnumerable<Product>> ListBooks();
+        Task<IEnumerable<Book>> ListBooks();
     }
 }

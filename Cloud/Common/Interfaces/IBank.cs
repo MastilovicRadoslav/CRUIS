@@ -8,9 +8,9 @@ namespace Common.Interfaces
     public interface IBank : IService, ITransaction
     {
         [OperationContract]
-        Task<IEnumerable<Customer>> ListClients();
+        Task<IEnumerable<Customer>> ListClients();        // Vraća sve klijente banke
 
         [OperationContract]
-        Task EnlistMoneyTransfer(string clientId, double amount);
+        Task EnlistMoneyTransfer(string clientId, double amount); // Dodaje zahtev za kupovinu sa određenim iznosom za kupca
     }
 }
