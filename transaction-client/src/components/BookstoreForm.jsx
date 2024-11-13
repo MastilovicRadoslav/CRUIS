@@ -11,20 +11,25 @@ export default function BookstoreForm() {
     const [books, setBooks] = useState([]);
     const [users, setUsers] = useState([]);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const booksData = await getBooks();
-                const clientsData = await getClients();
-                setBooks(booksData);
-                setUsers(clientsData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
+    // Funkcija za dohvaćanje podataka
+    const fetchData = async () => {
+        try {
+            const booksData = await getBooks();
+            const clientsData = await getClients();
+            console.log("Knjige:", booksData);
+            console.log("Klijenti:", clientsData);
+            setBooks(booksData);
+            setUsers(clientsData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
         }
+    };
+
+    // Učitaj podatke pri prvom prikazu
+    useEffect(() => {
         fetchData();
     }, []);
-    
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const purchaseRequest = { userId: userID, bookId: bookID, quantity: count, pricePerPC };
@@ -32,8 +37,13 @@ export default function BookstoreForm() {
         try {
             const result = await submitPurchaseRequest(purchaseRequest);
             setResponseMessage(result);
+
+            // Ako je kupovina uspešna, automatski ponovo učitaj podatke sa servera
+            if (result === "Kupovina uspešna") {
+                await fetchData(); // Ponovo učitavanje svih podataka sa servera
+            }
         } catch (error) {
-            setResponseMessage("Purchase failed. Please try again.");
+            setResponseMessage("Kupovina nije uspela. Pokušajte ponovo.");
         }
     };
 
@@ -42,9 +52,10 @@ export default function BookstoreForm() {
             <div className="transaction-form">
                 <h2>Prodavnica knjiga</h2>
                 <form onSubmit={handleSubmit}>
-                    <label>Kupac:</label>
+                    <label>
+                        <i className="bi bi-person-fill" style={{ color: 'green' }}></i> Kupac:
+                    </label>
                     <div className="input-with-icon">
-                        <i className="bi bi-person-fill"></i>
                         <select onChange={(e) => setUserID(e.target.value)} required>
                             <option value="">Izaberi kupca</option>
                             {users.map(user => (
@@ -55,18 +66,19 @@ export default function BookstoreForm() {
                         </select>
                     </div>
 
-                    <label>Knjiga:</label>
+                    <label>
+                        <i className="bi bi-book-fill" style={{ color: 'green' }}></i> Knjiga:
+                    </label>
                     <div className="input-with-icon">
-                        <i className="bi bi-book-fill"></i>
                         <select onChange={(e) => {
-                            const selectedBook = books.find(book => book.productId === e.target.value);
-                            setBookID(selectedBook?.productId || '');
+                            const selectedBook = books.find(book => book.bookId === e.target.value);
+                            setBookID(selectedBook?.bookId || '');
                             setPricePerPC(selectedBook?.unitPrice || 0);
                         }} required>
                             <option value="">Izaberi knjigu</option>
                             {books.map(book => (
-                                <option key={book.productId} value={book.productId}>
-                                    {book.name} (${book.unitPrice.toFixed(2)} - {book.stockQuantity} na stanju)
+                                <option key={book.bookId} value={book.bookId}>
+                                    {book.nameBook} (${book.unitPrice.toFixed(2)} - {book.quantity} na stanju)
                                 </option>
                             ))}
                         </select>
@@ -76,7 +88,7 @@ export default function BookstoreForm() {
                     <input
                         type="number"
                         min="1"
-                        max={books.find(book => book.productId === bookID)?.stockQuantity || 1}
+                        max={books.find(book => book.bookId === bookID)?.quantity || 1}
                         value={count}
                         onChange={(e) => setCount(Number(e.target.value))}
                         required

@@ -98,8 +98,8 @@ namespace BankService
             var customersExist = await customerAccounts.GetCountAsync(trx) > 0;
             if (!customersExist)
             {
-                var client1 = new Customer("Vladimir Mandic", 1000.0);
-                var client2 = new Customer("Radoslav Mastilovic", 1500.0);
+                var client1 = new Customer("Vladimir Mandic", new Random().NextDouble() * 1000);
+                var client2 = new Customer("Radoslav Mastilovic", new Random().NextDouble() * 1000);
 
                 await customerAccounts.TryAddAsync(trx, client1.ClientId, client1);
                 await customerAccounts.TryAddAsync(trx, client2.ClientId, client2);

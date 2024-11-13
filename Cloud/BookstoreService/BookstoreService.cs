@@ -27,10 +27,7 @@ namespace BookstoreService
 
             while (await enumerator.MoveNextAsync(CancellationToken.None))
             {
-                if (enumerator.Current.Value.Quantity > 0) // Ako postoje knjige u biblioteci
-                {
-                    availableProducts.Add(enumerator.Current.Value); // Dodaj knjige koje su na stanju
-                }
+                availableProducts.Add(enumerator.Current.Value); // Dodaj knjige koje su na stanju 
             }
             return availableProducts;
         }
